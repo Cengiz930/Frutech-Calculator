@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Frutech Calculator 🍉🍌🍇</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+  /* Common styles */
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Poppins', sans-serif;
+    user-select: none;
+    overflow-x: hidden;
+    transition: background 0.5s, color 0.5s;
+  }
+
+  /* Container */
+  .container {
+    max-width: 480px;
+    margin: 40px auto 40px auto;
+    padding: 30px 25px 40px 25px;
+    border-radius: 25px;
+    box-shadow:
+      0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(25px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: background 0.5s, box-shadow 0.5s;
+  }
+
+  /* Header */
+  h1 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 2.8rem;
+    margin: 0;
+    user-select: text;
+  }
+  h1 span {
+    font-size: 3.5rem;
+  }
+
+  /* Screen */
+  #screen {
+    border-radius: 20px;
+    padding: 20px 20px;
+    font-size: 2.2rem;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    min-height: 60px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    user-select: text;
+    transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+  }
+
+  /* Buttons grid */
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+  }
+
+  /* Each button */
+  button {
+    border: none;
+    border-radius: 15px;
+    padding: 20px 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    text-shadow: 0 0 3px currentColor;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    user-select: none;
+    position: relative;
+    transition: color 0.5s;
+  }
+  footer::after {
+    content: attr(data-text);
+    display: block;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transform: scaleY(-1);
+    opacity: 0.4;
+    filter: blur(1.5px);
+    margin-top: 4px;
+    transition: color 0.5s;
+  }
+
+  /* Fruit icon style */
+  .fruit-icon {
+    font-size: 1.2rem;
+    margin-left: 4px;
+    user-select: none;
+    filter: drop-shadow(0 0 1px currentColor);
+  }
+
+  /* History panel */
+  .history-panel {
+    max-width: 480px;
+    margin: 10px auto 40px auto;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 15px 20px;
+    backdrop-filter: blur(15px);
+    box-shadow:
+      0 0 12px 1px rgba(255,165,0,0.4);
+    overflow-y: auto;
+    max-height: 200px;
+    user-select: none;
+    font-size: 1rem;
+  }
+  .history-panel.dark {
+    background: rgba(0,0,0,0.25);
+    box-shadow:
+      0 0 12px 1px rgba(255,165,0,0.7);
+  }
+  .history-panel h2 {
+    margin-top: 0;
+    font-weight: 700;
+    text-align: center;
+    user-select: text;
+  }
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .history-list li {
+    padding: 6px 10px;
+    margin: 3px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .history-list li:hover {
+    background: rgba(255, 165, 0, 0.3);
+  }
+  .history-list li:active {
+    background: rgba(255, 165, 0, 0.5);
+  }
+
+  /* Themes */
+
+  /* Light Theme */
+  body.light {
+    background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+    color: #ff5a36;
+  }
+  body.light .container {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 8px 32px 0 rgba(31, 38, 135, 0.37),
+      0 0 10px 3px rgba(255, 165, 0, 0.4);
+  }
+  body.light #screen {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: inset 0 0 15px #ffbb66;
+  }
+  body.light button {
+    background: linear-gradient(145deg, #fff, #ffedc1);
+    color: #ff5a36;
+    box-shadow:
+      0 4px 6px rgba(255, 90, 54, 0.6),
+      inset 0 -3px 0 #b04a29;
+  }
+  body.light button.btn-func {
+    background: linear-gradient(145deg, #a8f0a4, #58bb54);
+    color: #114411;
+    box-shadow:
+      0 4px 8px rgba(42, 130, 42, 0.7),
+      inset 0 -3px 0 #145214;
+  }
+  body.light button.btn-equal {
+    background: linear-gradient(145deg, #ff8b00, #ff5000);
+    color: #fff;
+    box-shadow:
+      0 5px 12px #ff3b00,
+      inset 0 -4px 0 #b03000;
+  }
+  body.light footer {
+    color: #ff5a36;
+  }
+  body.light footer::after {
+    color: rgba(255, 90, 54, 0.3);
+  }
+  body.light .history-panel {
+    background: rgba(255,255,255,0.15);
+    box-shadow:
+      0 0 12px 1px rgba(255,165,0,0.4);
+    color: #ff5a36;
+  }
+
+  /* Dark Theme */
+  body.dark {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffb86c;
+  }
+  body.dark .container {
+    background: rgba(0,0,0,0.25);
+    box-shadow:
+      0 8px 32px 0 rgba(255, 165, 0, 0.6);
+  }
+  body.dark #screen {
+    background: rgba(0,0,0,0.4);
+    color: #fff4d6;
+    box-shadow: inset 0 0 15px #ffa500cc;
+  }
+  body.dark button {
+    background: linear-gradient(145deg, #222, #444);
+    color: #ffb86c;
+    box-shadow:
+      0 4px 6px rgba(255, 184, 108, 0.7),
+      inset 0 -3px 0 #b37a1f;
+  }
+  body.dark button.btn-func {
+    background: linear-gradient(145deg, #2f6d2f, #4fa74f);
+    color: #d6f6bb;
+    box-shadow:
+      0 4px 8px rgba(114, 198, 114, 0.9),
+      inset 0 -3px 0 #308230;
+  }
+  body.dark button.btn-equal {
+    background: linear-gradient(145deg, #ff7f00, #ff4500);
+    color: #fff;
+    box-shadow:
+      0 5px 12px #ff6300,
+      inset 0 -4px 0 #b23000;
+  }
+  body.dark footer {
+    color: #ffb86c;
+  }
+  body.dark footer::after {
+    color: rgba(255, 184, 108, 0.3);
+  }
+  body.dark .history-panel {
+    background: rgba(0,0,0,0.25);
+    box-shadow:
+      0 0 12px 1px rgba(255,165,0,0.7);
+    color: #ffb86c;
+  }
+
+  /* Theme switch button */
+  #theme-toggle {
+    margin: 0 auto 15px auto;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    background: linear-gradient(145deg, #ffbb66, #ff8b00);
+    border: none;
+    box-shadow:
+      0 4px 12px #ff7f00,
+      inset 0 -3px 0 #b34f00;
+    color: #fff;
+    text-shadow: 0 0 4px #ffa500;
+    user-select: none;
+    transition: background 0.3s;
+  }
+  #theme-toggle:hover {
+    background: linear-gradient(145deg, #ff8b00, #ffbb66);
+  }
+  #theme-toggle:active {
+    background: #b34f00;
+  }
+
+  /* Responsive */
+  @media (max-width: 520px) {
+    .container, .history-panel {
+      margin: 15px 15px 40px 15px;
+      max-width: 100%;
+      padding: 20px 15px 30px 15px;
+    }
+    button {
+      padding: 15px 0;
+      font-size: 1.1rem;
+    }
+    #screen {
+      font-size: 1.7rem;
+      min-height: 50px;
+      padding: 15px 12px;
+    }
+    #theme-toggle {
+      width: 100%;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+  }
+</style>
+</head>
+<body class="light">
+
+<div class="container" role="main" aria-label="Frutech Calculator">
+
+  <h1>Frutech Calculator <span>🍉🍌🍇</span></h1>
+
+  <button id="theme-toggle" aria-pressed="false" aria-label="Toggle light and dark theme">Switch to Dark Theme</button>
+
+  <div id="screen" class="screen" aria-live="polite" aria-atomic="true">0</div>
+
+  <div class="buttons" role="group" aria-label="Calculator buttons">
+
+    <!-- Row 1 -->
+    <button type="button" class="btn-func" aria-label="Clear" id="clear">C <span class="fruit-icon">🍒</span></button>
+    <button type="button" class="btn-func" aria-label="Delete last character" id="del">⌫ <span class="fruit-icon">🍍</span></button>
+    <button type="button" class="btn-func" aria-label="Factorial" data-value="!" id="fact">x! <span class="fruit-icon">🥝</span></button>
+    <button type="button" class="btn-func" aria-label="Modulo" data-value="%" id="mod">Mod <span class="fruit-icon">🍊</span></button>
+    <button type="button" class="btn-func" aria-label="Open parenthesis" data-value="(">( <span class="fruit-icon">🍋</span></button>
+
+    <!-- Row 2 -->
+    <button type="button" aria-label="7" data-value="7">7 <span class="fruit-icon">🍇</span></button>
+    <button type="button" aria-label="8" data-value="8">8 <span class="fruit-icon">🍉</span></button>
+    <button type="button" aria-label="9" data-value="9">9 <span class="fruit-icon">🍌</span></button>
+    <button type="button" aria-label="Divide" data-value="/">÷ <span class="fruit-icon">🥭</span></button>
+    <button type="button" class="btn-func" aria-label="Close parenthesis" data-value=")">) <span class="fruit-icon">🍏</span></button>
+
+    <!-- Row 3 -->
+    <button type="button" aria-label="4" data-value="4">4 <span class="fruit-icon">🍎</span></button>
+    <button type="button" aria-label="5" data-value="5">5 <span class="fruit-icon">🥥</span></button>
+    <button type="button" aria-label="6" data-value="6">6 <span class="fruit-icon">🍓</span></button>
+    <button type="button" aria-label="Multiply" data-value="*">× <span class="fruit-icon">🍑</span></button>
+    <button type="button" class="btn-func" aria-label="Exponent" data-value="^">^ <span class="fruit-icon">🍒</span></button>
+
+    <!-- Row 4 -->
+    <button type="button" aria-label="1" data-value="1">1 <span class="fruit-icon">🥭</span></button>
+    <button type="button" aria-label="2" data-value="2">2 <span class="fruit-icon">🍈</span></button>
+    <button type="button" aria-label="3" data-value="3">3 <span class="fruit-icon">🍒</span></button>
+    <button type="button" aria-label="Subtract" data-value="-">− <span class="fruit-icon">🍓</span></button>
+    <button type="button" class="btn-func" aria-label="Square root" data-value="sqrt(">&radic; <span class="fruit-icon">🍍</span></button>
+
+    <!-- Row 5 -->
+    <button type="button" aria-label="0" data-value="0">0 <span class="fruit-icon">🍍</span></button>
+    <button type="button" aria-label="Decimal point" data-value=".">. <span class="fruit-icon">🍑</span></button>
+    <button type="button" aria-label="Pi" data-value="pi">π <span class="fruit-icon">🍉</span></button>
+    <button type="button" aria-label="Add" data-value="+">+ <span class="fruit-icon">🍋</span></button>
+    <button type="button" id="equal" class="btn-equal" aria-label="Equals">= <span class="fruit-icon">🍍</span></button>
+
+  </div>
+</div>
+
+<!-- History panel -->
+<div class="history-panel" aria-label="Calculation history" role="region" tabindex="0">
+  <h2>🍊 Calculation History 🍊</h2>
+  <ul class="history-list" id="history-list" aria-live="polite" aria-relevant="additions"></ul>
+</div>
+
+<footer aria-label="Credits" data-text="🍓 Created by Cengiz Kara and Other Developers. 🍓">
+  🍓 Created by Cengiz Kara and Other Developers. 🍓
+</footer>
+
+<script>
+(() => {
+  const body = document.body;
+  const screen = document.getElementById('screen');
+  const buttons = document.querySelectorAll('.buttons button');
+  const clearBtn = document.getElementById('clear');
+  const delBtn = document.getElementById('del');
+  const equalBtn = document.getElementById('equal');
+  const historyList = document.getElementById('history-list');
+  const themeToggle = document.getElementById('theme-toggle');
+
+  let expression = '';
+
+  // Replace ^ with **
+  const replaceExponent = (expr) => expr.replace(/\^/g, '**');
+
+  // Factorial function
+  function factorial(n) {
+    n = Math.floor(n);
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
+
+  // Safe eval
+  function safeEval(expr) {
+    try {
+      expr = replaceExponent(expr);
+      expr = expr.replace(/\bpi\b/gi, 'Math.PI');
+      expr = expr.replace(/sqrt\(/gi, 'Math.sqrt(');
+
+      // Factorial handling - match number or (...)!
+      expr = expr.replace(/(\d+|\([^()]*\))!/g, (match, p1) => {
+        let val;
+        if (p1.startsWith('(')) val = safeEval(p1.slice(1, -1));
+        else val = Number(p1);
+        return factorial(val);
+      });
+
+      // Evaluate
+      return Function('"use strict";return (' + expr +       ')')();
+    } catch {
+      return 'Error';
+    }
+  }
+
+  // Update screen content
+  function updateScreen() {
+    screen.textContent = expression || '0';
+  }
+
+  // Save history to localStorage
+  function saveHistory(history) {
+    try {
+      localStorage.setItem('frutechCalcHistory', JSON.stringify(history));
+    } catch {
+      // ignore localStorage errors
+    }
+  }
+
+  // Load history from localStorage
+  function loadHistory() {
+    try {
+      const data = localStorage.getItem('frutechCalcHistory');
+      if (data) return JSON.parse(data);
+    } catch {}
+    return [];
+  }
+
+  // Render history list on page
+  function renderHistory(history) {
+    historyList.innerHTML = '';
+    history.forEach((item, idx) => {
+      const li = document.createElement('li');
+      li.textContent = `${item.expression} = ${item.result}`;
+      li.tabIndex = 0;
+      li.title = "Click to reuse this calculation";
+      li.addEventListener('click', () => {
+        expression = item.expression;
+        updateScreen();
+      });
+      li.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          expression = item.expression;
+          updateScreen();
+        }
+      });
+      historyList.appendChild(li);
+    });
+  }
+
+  // Initialize history
+  let history = loadHistory();
+  renderHistory(history);
+
+  // Button click handling
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const val = button.getAttribute('data-value');
+      if (button === clearBtn) {
+        expression = '';
+        updateScreen();
+        return;
+      }
+      if (button === delBtn) {
+        expression = expression.slice(0, -1);
+        updateScreen();
+        return;
+      }
+      if (button === equalBtn) {
+        const result = safeEval(expression);
+        if (result !== 'Error' && result !== undefined && result !== null) {
+          // Add to history if different from last entry
+          if (history.length === 0 || history[history.length - 1].expression !== expression) {
+            history.push({ expression: expression, result: result.toString() });
+            // Limit history size to 50
+            if (history.length > 50) history.shift();
+            saveHistory(history);
+            renderHistory(history);
+          }
+          expression = result.toString();
+        } else {
+          expression = 'Error';
+        }
+        updateScreen();
+        return;
+      }
+      if (val !== null) {
+        expression += val;
+        updateScreen();
+      }
+    });
+  });
+
+  // Keyboard support
+  window.addEventListener('keydown', e => {
+    const key = e.key;
+    if ((key >= '0' && key <= '9') || ['.', '(', ')', '+', '-', '*', '/', '%', '^'].includes(key)) {
+      expression += key;
+      updateScreen();
+    } else if (key === 'Enter' || key === '=') {
+      e.preventDefault();
+      const result = safeEval(expression);
+      if (result !== 'Error' && result !== undefined && result !== null) {
+        if (history.length === 0 || history[history.length - 1].expression !== expression) {
+          history.push({ expression: expression, result: result.toString() });
+          if (history.length > 50) history.shift();
+          saveHistory(history);
+          renderHistory(history);
+        }
+        expression = result.toString();
+      } else {
+        expression = 'Error';
+      }
+      updateScreen();
+    } else if (key === 'Backspace') {
+      expression = expression.slice(0, -1);
+      updateScreen();
+    } else if (key.toLowerCase() === 'c') {
+      expression = '';
+      updateScreen();
+    }
+  });
+
+  // Theme toggle
+  function setTheme(theme) {
+    if (theme === 'dark') {
+      body.classList.remove('light');
+      body.classList.add('dark');
+      themeToggle.textContent = 'Switch to Light Theme';
+      themeToggle.setAttribute('aria-pressed', 'true');
+      document.querySelector('.container').style.boxShadow = '0 8px 32px 0 rgba(255, 165, 0, 0.6)';
+      document.querySelector('.history-panel').classList.add('dark');
+    } else {
+      body.classList.remove('dark');
+      body.classList.add('light');
+      themeToggle.textContent = 'Switch to Dark Theme';
+      themeToggle.setAttribute('aria-pressed', 'false');
+      document.querySelector('.container').style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 10px 3px rgba(255, 165, 0, 0.4)';
+      document.querySelector('.history-panel').classList.remove('dark');
+    }
+    localStorage.setItem('frutechCalcTheme', theme);
+  }
+
+  // Load theme from storage or default light
+  const savedTheme = localStorage.getItem('frutechCalcTheme') || 'light';
+  setTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    if (body.classList.contains('light')) setTheme('dark');
+    else setTheme('light');
+  });
+
+  updateScreen();
+
+})();
+</script>
+
+</body>
+</html>
+
